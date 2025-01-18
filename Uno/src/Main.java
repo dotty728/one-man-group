@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Collections;
 
-public class potat {
+public class Main {
     public static void main(String[] args) {
 
         int scoreP1 = 0;
@@ -87,11 +87,11 @@ public class potat {
 
                     System.out.println(currentplayer + "'s hand: " + playershand);
                     System.out.println("The top card is: " + topcard);
-                    System.out.println("Play a card by typing 'card' or draw a card by typing 'draw':");
+                    System.out.println("Play a card by typing 'card' or draw a card by typing 'draw'");
                     String move = sc.nextLine();
 
                     if (move.equals("card")) {
-                        System.out.println("Enter the card number you want to play (1-based index):");
+                        System.out.println("Enter the card number you want to play");
                         int decision = sc.nextInt() - 1;
                         sc.nextLine();
 
@@ -110,21 +110,18 @@ public class potat {
                             } else {
                                 playedcardnumber = playedcard.substring(playedcard.indexOf(" ") + 1);
                             }
-
                             String topcardcolor;
                             if (topcard.contains("Wild")) {
                                 topcardcolor = topcard.split(" ")[0];
                             } else {
                                 topcardcolor = topcard.substring(0, topcard.indexOf(" "));
                             }
-
                             String topcardnumber;
                             if (topcard.contains("Wild")) {
                                 topcardnumber = "Wild";
                             } else {
                                 topcardnumber = topcard.substring(topcard.indexOf(" ") + 1);
                             }
-
                             if (playedcardcolor.equals(topcardcolor) || playedcardnumber.equals(topcardnumber) || playedcard.contains("Wild")) {
                                 System.out.println(currentplayer + " played " + playedcard);
                                 playershand.remove(decision);
@@ -155,7 +152,7 @@ public class potat {
                                     player1turn = !player1turn;
 
                                 } else if (playedcardnumber.equals("Draw two")) {
-                                    System.out.println("You played a Draw Two card! The opponent draws 2 cards.");
+                                    System.out.println("You played a Draw Two card your opponent draws 2 cards");
                                     ArrayList<String> opponentHand;
                                     if (player1turn) {
                                         opponentHand = P2;
@@ -197,8 +194,6 @@ public class potat {
                     scoreP2 += P1.size();
                     System.out.println("Player 1 has " + scoreP1 + " points and player 2 has " + scoreP2 + " points");
                 }
-
-                // Ask if the player wants to play again
                 System.out.println("Do you want to play again? Type 'yes' to restart or 'no' to end the game.");
                 String restartselection = sc.nextLine().toLowerCase();
                 if (!restartselection.equals("yes")) {
@@ -210,78 +205,163 @@ public class potat {
                 break;
 
             }
-            case 2: { // Fixed the error by placing this case inside the switch block
+            case 2: {
                 ArrayList<String> playerHand = new ArrayList<>();
                 ArrayList<String> botHand = new ArrayList<>();
-                System.out.println("Enter your name ");
+                System.out.println("Enter your name: ");
                 String player = sc.nextLine();
 
-                // Deal cards
                 for (int i = 0; i < 7; i++) {
                     playerHand.add(cards.remove(0));
                     botHand.add(cards.remove(0));
                 }
-
                 boolean playerTurn = true;
-                while (!playerHand.isEmpty() && !botHand.isEmpty()) {
-                    ArrayList<String> currentPlayerHand;
-                    String currentPlayer;
+                boolean skipNextTurn = false;
 
-                    if (playerTurn) {
-                        currentPlayerHand = playerHand;
-                        currentPlayer = player;
-                    } else {
-                        currentPlayerHand = botHand;
-                        currentPlayer = "Bot";
+                while (!playerHand.isEmpty() && !botHand.isEmpty()) {
+                    if (cards.size() == 0) {
+                        System.out.println("The deck is empty, the game ends");
+                        System.out.println("Restart the game by typing 'yes' or end the whole game by typing 'no'");
+                        String restartselection = sc.nextLine().toLowerCase();
+                        if (restartselection.equals("yes")) {
+                            main(args);
+                        } else {
+                            System.out.println("Thanks for playing");
+                            return;
+                        }
                     }
+
+                    //checks skip before each players turn to ensure it happens
+                    if (skipNextTurn) {
+                        skipNextTurn = false;
+                        playerTurn = !playerTurn;
+                        System.out.println("Skipping turn");
+                        continue;
+                    }
+
+                    ArrayList<String> currentPlayerHand = playerTurn ? playerHand : botHand;
+                    String currentPlayer = playerTurn ? player : "Bot";
 
                     System.out.println(currentPlayer + "'s hand: " + currentPlayerHand);
                     System.out.println("Top card: " + topcard);
 
                     if (playerTurn) {
+                        // Player's turn
                         System.out.println("Play a card 'card' or draw 'draw'?");
                         String move = sc.nextLine();
 
                         if (move.equalsIgnoreCase("card")) {
                             System.out.println("Enter card number to play (1-based index):");
-                            int cardIndex = sc.nextInt() - 1;
+                            int decision2 = sc.nextInt() - 1;
                             sc.nextLine();
 
-                            if (cardIndex >= 0 && cardIndex < currentPlayerHand.size()) {
-                                String selectedCard = currentPlayerHand.get(cardIndex);
-                                if (selectedCard.startsWith(topcard.split(" ")[0]) || selectedCard.endsWith(topcard.split(" ")[1]) || selectedCard.contains("Wild")) {
-                                    topcard = selectedCard;
-                                    currentPlayerHand.remove(cardIndex);
-                                    System.out.println(currentPlayer + " just played " + selectedCard);
+                            if (decision2 >= 0 && decision2 < currentPlayerHand.size()) {
+                                String playedcard = currentPlayerHand.get(decision2);
+                                String playedcardcolor;
+                                String playedcardnumber;
+
+                                if (playedcard.contains("Wild")) {
+                                    playedcardcolor = "";
+                                    playedcardnumber = "Wild";
                                 } else {
-                                    System.out.println("Invalid move.");
+                                    playedcardcolor = playedcard.substring(0, playedcard.indexOf(" "));
+                                    playedcardnumber = playedcard.substring(playedcard.indexOf(" ") + 1);
+                                }
+
+                                String topcardcolor;
+                                String topcardnumber;
+
+                                if (topcard.contains("Wild")) {
+                                    topcardcolor = topcard.split(" ")[0];
+                                    topcardnumber = "Wild";
+                                } else {
+                                    topcardcolor = topcard.substring(0, topcard.indexOf(" "));
+                                    topcardnumber = topcard.substring(topcard.indexOf(" ") + 1);
+                                }
+
+                                if (playedcardcolor.equals(topcardcolor) || playedcardnumber.equals(topcardnumber) || playedcard.contains("Wild")) {
+                                    System.out.println(currentPlayer + " played " + playedcard);
+                                    currentPlayerHand.remove(decision2);
+
+                                    if (playedcard.contains("Wild Draw 4")) {
+                                        System.out.println("You played a Wild Draw 4 card! The opponent draws 4 cards.");
+                                        for (int i = 0; i < 4; i++) {
+                                            botHand.add(cards.remove(0));
+                                        }
+                                        System.out.println("Pick the new color (R, B, G, Y)");
+                                        String wildcolor = sc.nextLine().toUpperCase();
+                                        System.out.println("The new color is: " + wildcolor);
+                                        topcard = wildcolor + " Wild Draw 4";
+                                    } else if (playedcard.contains("Wild")) {
+                                        System.out.println("You played a Wild card. Pick the new color (R, B, G, Y)");
+                                        String wildcolor = sc.nextLine().toUpperCase();
+                                        System.out.println("The new color is: " + wildcolor);
+                                        topcard = wildcolor + " Wild";
+                                    } else if (playedcardnumber.equals("skip")) {
+                                        System.out.println("You played a Skip card! The next player loses their turn.");
+                                        topcard = playedcard;
+                                        skipNextTurn = true; // Set flag to skip next turn
+                                    } else if (playedcardnumber.equals("Draw two")) {
+                                        System.out.println("You played a Draw Two card! The opponent draws 2 cards.");
+                                        for (int i = 0; i < 2; i++) {
+                                            botHand.add(cards.remove(0));
+                                        }
+                                        topcard = playedcard;
+                                    } else {
+                                        topcard = playedcard;
+                                    }
+
+                                    playerTurn = !playerTurn;
+                                } else {
+                                    System.out.println("Invalid card. Try again.");
                                 }
                             } else {
-                                System.out.println("Invalid card index.");
+                                System.out.println("Invalid card number.");
                             }
                         } else if (move.equalsIgnoreCase("draw")) {
-                            if (!cards.isEmpty()) {
-                                String drawnCard = cards.remove(0);
-                                currentPlayerHand.add(drawnCard);
-                                System.out.println(currentPlayer + " drew " + drawnCard);
-                            } else {
-                                System.out.println("No cards left to draw.");
-                            }
+                            String newcard = cards.remove(0);
+                            playerHand.add(newcard);
+                            System.out.println("You drew: " + newcard);
+                            playerTurn = !playerTurn;
                         } else {
-                            System.out.println("Invalid move. Try again.");
+                            System.out.println("Invalid input. Try again.");
                         }
                     } else {
+                        // Bot's turn
                         boolean botPlayed = false;
                         for (int i = 0; i < botHand.size(); i++) {
                             String botCard = botHand.get(i);
                             if (botCard.startsWith(topcard.split(" ")[0]) || botCard.endsWith(topcard.split(" ")[1]) || botCard.contains("Wild")) {
-                                topcard = botCard;
                                 botHand.remove(i);
-                                System.out.println("Bot played " + botCard);
+
+                                if (botCard.contains("Wild Draw 4")) {
+                                    System.out.println("Bot played a Wild Draw 4 card! You draw 4 cards.");
+                                    for (int j = 0; j < 4; j++) {
+                                        playerHand.add(cards.remove(0));
+                                    }
+
+                                    String chosenColor = colors[(int) (Math.random() * colors.length)];
+                                    System.out.println("The new color is: " + chosenColor);
+                                    topcard = chosenColor + " Wild Draw 4";
+                                } else if (botCard.contains("Wild")) {
+                                    System.out.println("Bot played a Wild card. The new color is chosen randomly.");
+
+                                    String chosenColor = colors[(int) (Math.random() * colors.length)];
+                                    System.out.println("The new color is: " + chosenColor);
+                                    topcard = chosenColor + " Wild";
+                                } else if (botCard.endsWith("skip")) {
+                                    System.out.println("Bot played a Skip card! You lose your turn.");
+                                    skipNextTurn = true;
+                                    topcard = botCard;
+                                } else {
+                                    topcard = botCard;
+                                    System.out.println("Bot played " + botCard);
+                                }
                                 botPlayed = true;
                                 break;
                             }
                         }
+
                         if (!botPlayed) {
                             if (!cards.isEmpty()) {
                                 String drawnCard = cards.remove(0);
@@ -291,15 +371,28 @@ public class potat {
                                 System.out.println("No cards left to draw for the bot.");
                             }
                         }
+                        playerTurn = !playerTurn;
                     }
-
-                    playerTurn = !playerTurn;
                 }
-
-                System.out.println(playerHand.isEmpty() ? player + " wins!" : "Bot wins!");
-                break;
+                if (playerHand.size() == 0) {
+                    System.out.println(player + " wins!");
+                    scoreP1 += botHand.size();
+                    System.out.println("Player 1 has " + scoreP1 + " points and bot has " + scoreP2 + " points");
+                } else if (botHand.size() == 0) {
+                    System.out.println(botHand + " wins!");
+                    scoreP2 += playerHand.size();
+                    System.out.println("Player 1 has " + scoreP1 + " points and bot has " + scoreP2 + " points");
+                }
+                System.out.println("Do you want to play again? Type 'yes' to restart or 'no' to end the game.");
+                String restartselection = sc.nextLine().toLowerCase();
+                if (!restartselection.equals("yes")) {
+                    System.out.println("Thanks for playing the final scores are");
+                    System.out.println(player +  + scoreP1 + "points");
+                    System.out.println("Bot " + scoreP2 + " points");
+                    return;
+                }
             }
-        }
+            }
 
+        }
     }
-}
